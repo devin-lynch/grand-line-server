@@ -9,15 +9,15 @@ const clientID = process.env.MAL_CLIENT_ID;
 
 const apiCall = async () => {
     try {
-        const url =
-            'https://api.myanimelist.net/v2/anime/10357?fields=rank,mean,alternative_titles';
-        const response = await fetch(url, {
+        const url = 'https://api.myanimelist.net/v2';
+        const response = await fetch(`${url}/anime?q=one&limit=10`, {
             headers: {
                 'X-MAL-CLIENT-ID': clientID,
             },
         });
-        const data = await response.json();
+        const { data } = await response.json();
         console.log(data);
+        return data;
     } catch (error) {
         console.warn(error);
     }
@@ -25,9 +25,13 @@ const apiCall = async () => {
 
 apiCall();
 
-app.get('/', (req, res) => {
-    res.send('Home page!');
+app.get('/', async (req, res) => {
+    const data = await apiCall();
+    res.send(data);
 });
+
+app.use('/anime', require('./controllers/anime'));
+app.use('/manga', require('./controllers/manga'));
 
 app.listen(3003, () => {
     console.log("Explorin' the Grand Line!");
